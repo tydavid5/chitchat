@@ -55,6 +55,7 @@ Net balance per member = total paid minus total share owed. Debts are simplified
 - Broadcast `message` for chat, `chit` for confirmed/edited/deleted chits, `settle` for settlements, `typing` for typing indicators.
 - Presence tracks members in the room. A member who vanishes stays listed for a 10-second grace before being pruned, so a brief dropout does not flicker the board.
 - Draft chits are local only until confirmed. The other members never see an unconfirmed draft.
+- Broadcasts are fire-and-forget, so a client that misses one must be able to pull the room state: `sync-request` is answered by any peer with a full `sync-state`, merged by id (newest `updatedAt` wins), and a sync is requested whenever the tab becomes visible, the window regains focus, the Ledger or Balances tab opens, and on a 20-second heartbeat. A sync-state is never accepted only once.
 
 ## Kiro usage (honest record)
 

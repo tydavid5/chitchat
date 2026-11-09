@@ -21,9 +21,9 @@ This is a demo with pretend balances. No real money moves in the app. Settling o
 ## Tech
 
 - Single-page web app. One HTML file, one CSS file, one JS file. No build step, no framework.
-- Live sync with Supabase Realtime Broadcast and Presence, on the free tier, under the `chitchat-room-CODE` channel namespace. The key shipped is the publishable anon key.
+- Live sync with Supabase Realtime Broadcast and Presence, on the free tier, under the `chitchat-room-CODE` channel namespace. The key shipped is the publishable anon key. Broadcasts are fire-and-forget, so a client that misses one pulls the room state again: every sync-state is merged, and a sync is requested when the tab becomes visible, when the window regains focus, when the Ledger or Balances tab opens, and on a 20-second heartbeat.
 - Phone-first layout, works in a mobile browser.
-- `node --check` passes on every JS file. Parser and balance logic has 31 passing checks in `tools/ledger-mcp` scratch tests.
+- `node --check` passes on every JS file. Parser and balance logic has 31 passing checks in `tools/ledger-mcp/test-parser.js` (`node tools/ledger-mcp/test-parser.js`).
 
 ## How Kiro was used
 
@@ -49,7 +49,7 @@ Open http://localhost:8000, create a room, open the same link in a second tab or
 ```
 .kiro/            Specs, steering, hooks, MCP config (committed, never gitignored)
 app/              index.html, styles.css, app.js
-tools/ledger-mcp/ Ledger MCP server (server.mjs) and its local JSON store
+tools/ledger-mcp/ Ledger MCP server (server.mjs) and its local JSON store, plus the parser and balance checks (test-parser.js)
 README.md
 LICENSE           MIT
 ```

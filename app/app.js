@@ -224,7 +224,6 @@
   var typingMap = {};     /* senderId -> { name, at } */
   var lastTypingSent = 0;
   var draft = null;       /* local draft chit, payer only, never synced */
-  var syncAccepted = false;
   var editingChitId = null;
 
   var GRACE_MS = 10000;
@@ -319,8 +318,8 @@
       $('tab-' + t).classList.toggle('hidden', t !== tab);
       $('tabbtn-' + t).classList.toggle('active', t === tab);
     });
-    if (tab === 'ledger') renderLedger();
-    if (tab === 'balances') renderBalances();
+    if (tab === 'ledger') { renderLedger(); requestSync(); }
+    if (tab === 'balances') { renderBalances(); requestSync(); }
   }
 
   function renderAll() {
@@ -502,6 +501,16 @@
     channel.send({ type: 'broadcast', event: event, payload: payload }).catch(function () { /* offline, local copy stays */ });
   }
 
+  /* Ask everyone in the room for their full state. Each peer answers with a
+     sync-state, which mergeState folds in by id. This is the recovery path
+     when a live broadcast is missed (backgrounded tab, flaky mobile link):
+     broadcasts are fire-and-forget, so a client that missed one must be able
+     to pull the current state instead of waiting for the next event. */
+  function requestSync() {
+    if (!channel || !roomCode) return;
+    broadcast('sync-request', { from: deviceId });
+  }
+
   function mergeState(data) {
     var byId = {};
     messages.forEach(function (m) { byId[m.id] = m; });
@@ -555,7 +564,6 @@
     roomCode = code.toUpperCase();
     myName = displayName;
     loadLocal();
-    syncAccepted = false;
     showRoom();
     history.replaceState(null, '', location.pathname + '?room=' + roomCode);
     try { localStorage.setItem('chitchat-last-room', roomCode); } catch (e) { /* ignore */ }
@@ -632,8 +640,10 @@
       })
       .on('broadcast', { event: 'sync-state' }, function (msg) {
         var p = msg.payload;
-        if (!p || p.to !== deviceId || syncAccepted) return;
-        syncAccepted = true;
+        if (!p || p.to !== deviceId) return;
+        /* Accept every sync-state, not just the first. mergeState dedupes by
+           id and keeps the newest updatedAt, so a late or repeated state can
+           only fill gaps, never duplicate or roll back. */
         mergeState(p);
       })
       .on('presence', { event: 'sync' }, handlePresence)
@@ -920,6 +930,15 @@
       localStorage.setItem('chitchat-display-name', displayName);
     });
     setInterval(renderTyping, 2000);
+
+    /* Pull the room state again whenever this client might have missed a
+       live broadcast: coming back to the tab, switching back to the window,
+       and a slow heartbeat while in a room. */
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') requestSync();
+    });
+    window.addEventListener('focus', requestSync);
+    setInterval(requestSync, 20000);
 
     /* Join by link: ?room=CODE. Auto-join when a name is already saved. */
     var params = new URLSearchParams(location.search);
