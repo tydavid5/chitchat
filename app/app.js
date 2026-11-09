@@ -220,6 +220,9 @@
   var chits = [];
   var settlements = [];
   var members = {};       /* id -> { id, name, present, graceUntil } */
+  var knownNames = {};   /* id -> last seen display name; never pruned, so a
+                            member whose presence dropped still shows their
+                            name on the balance board instead of "Someone" */
   var graceTimers = {};   /* id -> timeout */
   var typingMap = {};     /* senderId -> { name, at } */
   var lastTypingSent = 0;
@@ -233,6 +236,7 @@
   function memberName(id) {
     if (id === deviceId) return myName || displayName || 'You';
     if (members[id]) return members[id].name;
+    if (knownNames[id]) return knownNames[id];
     return 'Someone';
   }
 
@@ -260,7 +264,8 @@
       localStorage.setItem('chitchat-room-' + roomCode, JSON.stringify({
         messages: messages.slice(-200),
         chits: chits,
-        settlements: settlements
+        settlements: settlements,
+        knownNames: knownNames
       }));
     } catch (e) { /* storage full or unavailable, live sync still works */ }
   }
@@ -274,6 +279,7 @@
       messages = data.messages || [];
       chits = data.chits || [];
       settlements = data.settlements || [];
+      knownNames = data.knownNames || {};
     } catch (e) { /* ignore a bad cache */ }
   }
 
@@ -528,6 +534,10 @@
     settlements = Object.keys(setById).map(function (id) { return setById[id]; });
     (data.messages || []).forEach(function (m) {
       if (!members[m.senderId]) members[m.senderId] = { id: m.senderId, name: m.senderName, present: false };
+      if (m.senderName) knownNames[m.senderId] = m.senderName;
+    });
+    (data.chits || []).forEach(function (c) {
+      if (c.payerName) knownNames[c.payerId] = c.payerName;
     });
     saveLocal();
     renderAll();
@@ -543,6 +553,7 @@
       presentIds[key] = true;
       if (graceTimers[key]) { clearTimeout(graceTimers[key]); delete graceTimers[key]; }
       members[key] = { id: key, name: presences[0].name || 'Someone', present: true };
+      if (presences[0].name) knownNames[key] = presences[0].name;
     });
     /* 10-second grace: a vanished member stays listed as away, then is pruned. */
     Object.keys(members).forEach(function (id) {
@@ -582,6 +593,7 @@
         if (!m || messages.some(function (x) { return x.id === m.id; })) return;
         messages.push(m);
         if (!members[m.senderId]) members[m.senderId] = { id: m.senderId, name: m.senderName, present: false };
+        if (m.senderName) knownNames[m.senderId] = m.senderName;
         saveLocal();
         renderMessages();
       })
@@ -589,6 +601,7 @@
         var c = msg.payload;
         if (!c || chits.some(function (x) { return x.id === c.id; })) return;
         chits.push(c);
+        if (c.payerName) knownNames[c.payerId] = c.payerName;
         saveLocal();
         renderLedger();
         renderBalances();

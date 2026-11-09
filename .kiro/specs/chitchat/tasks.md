@@ -39,14 +39,15 @@
 - [ ] 7. Checks
   - [x] 7.1 `node --check` passes on every JS file
   - [x] 7.2 Parser unit checks pass, including "lol ok" proposing nothing
-  - [ ] 7.3 Two-tab live test: message, draft, confirm, balances, settle all match on both tabs (NOT done here: no real browser in this environment, jsdom has no WebSocket so Supabase Realtime could not connect. Local flows verified in jsdom, 23/23 checks. The live two-device check ran 2026-11-09 on room SKEZ with a real phone: chat and the payer-only draft matched, but the confirmed chit never reached the phone, see task 9.)
+  - [x] 7.3 Two-tab live test: message, draft, confirm, balances, settle all match on both tabs (live two-device check ran 2026-11-09 on room SKEZ with a real phone, Five on the cloud browser and Ada on Five's phone: chat and the payer-only draft matched at once; the confirmed chit first missed the phone, fixed by task 9, then ledger, balances and settle all matched on both devices. All six checks pass.)
 
-- [ ] 8. Docs for the repo
-  - [ ] 8.1 README.md opening with the problem sentence, then how it works, then the Kiro usage write-up
-  - [ ] 8.2 MIT LICENSE file
-  - [ ] 8.3 `.kiro/` committed at the repo root, not in `.gitignore`
+- [x] 8. Docs for the repo
+  - [x] 8.1 README.md opening with the problem sentence, then how it works, then the Kiro usage write-up
+  - [x] 8.2 MIT LICENSE file
+  - [x] 8.3 `.kiro/` committed at the repo root, not in `.gitignore`
 
 - [x] 9. Sync recovery (found by the live two-device check, 2026-11-09)
   - [x] 9.1 Diagnose: a confirmed chit is broadcast once, fire-and-forget. A phone that misses it (backgrounded tab, flaky mobile link) never recovers, because sync-state was accepted only once and sync-request was only sent on subscribe.
   - [x] 9.2 Fix in app/app.js: accept every sync-state (mergeState dedupes by id and keeps the newest updatedAt), and request a sync when the tab becomes visible, when the window regains focus, when the Ledger or Balances tab opens, and on a 20-second heartbeat.
   - [x] 9.3 Parser and balance checks moved into the repo as tools/ledger-mcp/test-parser.js and pass 31/31 against the fixed app.js; README now names the real test file.
+  - [x] 9.4 Name memory (2026-11-09): the balance board briefly showed "Someone" for Ada on the Five side just before settling, because her presence had dropped while her phone was backgrounded and memberName fell back to "Someone". Added a knownNames map, filled from presence, messages, chits and sync-state, persisted in the room cache, and never pruned: a member whose presence dropped still shows their name.
