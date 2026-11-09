@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ChitChat - the group chat that is the ledger</title>
+<meta name="description" content="Splitting money with friends means a spreadsheet nobody updates and a chat full of you owe me messages nobody can add up. ChitChat is a group chat that is the ledger. Demo: pretend balances, no real money moves.">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">💬</span> ChitChat</div>
+  <div class="demo-pill">Demo: pretend balances, no real money moves</div>
+</header>
+
+<main class="wrap">
+
+  <!-- Join / create screen -->
+  <section id="join-screen">
+    <h1>The group chat that is the ledger.</h1>
+    <p class="lede">Splitting money with friends means a spreadsheet nobody updates and a chat full of "you owe me" messages nobody can add up. ChitChat fixes that: talk about money normally, confirm the draft, watch the board move.</p>
+    <p class="demo-note">Demo: pretend balances, no real money moves. No account, no card, no real payment anywhere in this app.</p>
+
+    <label class="field-label" for="name-input">Your display name</label>
+    <input id="name-input" class="input" type="text" placeholder="e.g. Five" maxlength="24" autocomplete="off">
+
+    <label class="field-label" for="code-input">Room code (4 letters)</label>
+    <input id="code-input" class="input code-input" type="text" placeholder="ABCD" maxlength="4" autocomplete="off">
+
+    <div class="join-actions">
+      <button id="join-btn" class="btn primary big">Join room</button>
+      <button id="create-btn" class="btn big">Create a room</button>
+    </div>
+
+    <p class="hint">Create makes a new 4-letter room. Join enters a room a friend already made. Share the room link and everyone joins from their phone.</p>
+  </section>
+
+  <!-- Room screen -->
+  <section id="room-screen" class="hidden">
+    <div class="room-head">
+      <div>
+        <div class="room-code">Room <strong id="room-code-label">----</strong></div>
+        <div id="conn-note" class="conn-note">Connecting...</div>
+      </div>
+      <div class="room-actions">
+        <button id="share-btn" class="btn small">Share link</button>
+        <button id="leave-btn" class="btn small danger-text">Leave</button>
+      </div>
+    </div>
+
+    <div id="member-list" class="member-list"></div>
+    <p class="demo-note small">Demo: pretend balances, no real money moves.</p>
+
+    <nav class="tabs">
+      <button id="tabbtn-chat" class="tabbtn active">Chat</button>
+      <button id="tabbtn-ledger" class="tabbtn">Ledger</button>
+      <button id="tabbtn-balances" class="tabbtn">Balances</button>
+    </nav>
+
+    <!-- Chat tab -->
+    <div id="tab-chat" class="tab">
+      <div id="message-list" class="message-list"></div>
+      <div id="typing-indicator" class="typing"></div>
+      <div id="draft-card" class="draft-card hidden"></div>
+      <p class="parser-note">The money parser is pattern-based, not magic. It spots amounts and splits in your messages and proposes a draft. Nothing counts until you confirm it.</p>
+      <div class="composer">
+        <input id="message-input" class="input" type="text" placeholder="Type a message... try: I paid 12,000 for dinner split 4 ways" autocomplete="off">
+        <button id="send-btn" class="btn primary">Send</button>
+      </div>
+    </div>
+
+    <!-- Ledger tab -->
+    <div id="tab-ledger" class="tab hidden">
+      <button id="add-expense-btn" class="btn primary wide">+ Add expense</button>
+      <div id="ledger-list" class="ledger-list"></div>
+    </div>
+
+    <!-- Balances tab -->
+    <div id="tab-balances" class="tab hidden">
+      <div id="balance-board"></div>
+      <p class="hint">Settling here only records that a debt was paid. No real money moves.</p>
+    </div>
+
+    <!-- Add / edit expense form -->
+    <div id="expense-form" class="expense-form hidden">
+      <h2 id="expense-title">Add expense</h2>
+      <label class="field-label" for="expense-amount">Amount</label>
+      <div class="amount-row">
+        <input id="expense-amount" class="input" type="text" inputmode="decimal" placeholder="e.g. 12,000" autocomplete="off">
+        <select id="expense-currency" class="input currency-select">
+          <option value="NGN">NGN (₦)</option>
+          <option value="USD">USD ($)</option>
+        </select>
+      </div>
+      <label class="field-label" for="expense-note">Note</label>
+      <input id="expense-note" class="input" type="text" placeholder="e.g. dinner" maxlength="80" autocomplete="off">
+      <label class="field-label" for="expense-payer">Paid by</label>
+      <select id="expense-payer" class="input"></select>
+      <span class="field-label">Split among</span>
+      <div id="expense-split" class="split-checks"></div>
+      <div class="form-actions">
+        <button id="expense-save" class="btn primary">Save expense</button>
+        <button id="expense-cancel" class="btn">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast" class="toast hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>

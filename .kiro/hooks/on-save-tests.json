@@ -1,0 +1,1 @@
+{"hooks":[{"command":"node --check ${file}","event":"onFileSave","name":"Check JS syntax on save","patterns":["app/**/*.js","tools/**/*.mjs"]}]}

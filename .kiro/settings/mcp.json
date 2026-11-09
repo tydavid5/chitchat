@@ -1,0 +1,1 @@
+{"mcpServers":{"chitchat-ledger":{"args":["tools/ledger-mcp/server.mjs"],"autoApprove":[],"command":"node","disabled":false,"env":{}}}}
