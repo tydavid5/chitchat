@@ -5,20 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ChitChat - the group chat that is the ledger</title>
 <meta name="description" content="Splitting money with friends means a spreadsheet nobody updates and a chat full of you owe me messages nobody can add up. ChitChat is a group chat that is the ledger. Demo: pretend balances, no real money moves.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><span class="brand-mark">💬</span> ChitChat</div>
+  <div class="brand-wrap">
+    <span class="window-dots" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+    <div class="brand"><span class="brand-mark">💬</span> ChitChat</div>
+  </div>
   <div class="demo-pill">Demo: pretend balances, no real money moves</div>
 </header>
 
 <main class="wrap">
-
-  <!-- Join / create screen -->
   <section id="join-screen">
-    <h1>The group chat that is the ledger.</h1>
+    <p class="eyebrow">Chat, ledger and settle up in one place</p>
+    <h1>The group chat that is the <span class="accent">ledger.</span></h1>
     <p class="lede">Splitting money with friends means a spreadsheet nobody updates and a chat full of "you owe me" messages nobody can add up. ChitChat fixes that: talk about money normally, confirm the draft, watch the board move.</p>
     <p class="demo-note">Demo: pretend balances, no real money moves. No account, no card, no real payment anywhere in this app.</p>
 
@@ -34,13 +39,18 @@
     </div>
 
     <p class="hint">Create makes a new 4-letter room. Join enters a room a friend already made. Share the room link and everyone joins from their phone.</p>
-  </section>
 
-  <!-- Room screen -->
+    <div class="how-thread">
+      <div class="how-title">How it works</div>
+      <p class="how-msg"><strong>Five:</strong> I paid 12,000 for dinner split 4 ways</p>
+      <p class="how-msg mine"><strong>ChitChat:</strong> Draft chit ready. Confirm it, edit it, or dismiss it.</p>
+      <p class="how-msg"><strong>Board:</strong> Ada owes Five 3,000. One tap settles up.</p>
+    </div>
+  </section>
   <section id="room-screen" class="hidden">
     <div class="room-head">
       <div>
-        <div class="room-code">Room <strong id="room-code-label">----</strong></div>
+        <div class="room-code">Room <strong id="room-code-label">....</strong></div>
         <div id="conn-note" class="conn-note">Connecting...</div>
       </div>
       <div class="room-actions">
@@ -53,12 +63,10 @@
     <p class="demo-note small">Demo: pretend balances, no real money moves.</p>
 
     <nav class="tabs">
-      <button id="tabbtn-chat" class="tabbtn active">Chat</button>
-      <button id="tabbtn-ledger" class="tabbtn">Ledger</button>
-      <button id="tabbtn-balances" class="tabbtn">Balances</button>
+      <button id="tabbtn-chat" class="tabbtn active"># chat</button>
+      <button id="tabbtn-ledger" class="tabbtn"># ledger</button>
+      <button id="tabbtn-balances" class="tabbtn"># balances</button>
     </nav>
-
-    <!-- Chat tab -->
     <div id="tab-chat" class="tab">
       <div id="message-list" class="message-list"></div>
       <div id="typing-indicator" class="typing"></div>
@@ -69,20 +77,14 @@
         <button id="send-btn" class="btn primary">Send</button>
       </div>
     </div>
-
-    <!-- Ledger tab -->
     <div id="tab-ledger" class="tab hidden">
       <button id="add-expense-btn" class="btn primary wide">+ Add expense</button>
       <div id="ledger-list" class="ledger-list"></div>
     </div>
-
-    <!-- Balances tab -->
     <div id="tab-balances" class="tab hidden">
       <div id="balance-board"></div>
       <p class="hint">Settling here only records that a debt was paid. No real money moves.</p>
     </div>
-
-    <!-- Add / edit expense form -->
     <div id="expense-form" class="expense-form hidden">
       <h2 id="expense-title">Add expense</h2>
       <label class="field-label" for="expense-amount">Amount</label>

@@ -1,11 +1,11 @@
 (function () {
   'use strict';
 
-  /* ------------------------------------------------------------------
+  /* ==================================================================
    * Pure logic: money parser, balances, formatting.
    * These functions have no DOM or network dependencies, so they can
    * be unit tested from Node as well as used in the browser.
-   * ------------------------------------------------------------------ */
+   * ================================================================== */
 
   function escapeRegExp(s) {
     return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -194,9 +194,9 @@
   /* The rest of this file only runs in a browser. */
   if (typeof document === 'undefined') return;
 
-  /* ------------------------------------------------------------------
+  /* ==================================================================
    * Browser app
-   * ------------------------------------------------------------------ */
+   * ================================================================== */
 
   var SUPABASE_URL = 'https://obxfkslspfovsplmliac.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_mvOBBaOvg1QnONjLwe7zrQ_VZEYNKO8';
@@ -231,7 +231,7 @@
 
   var GRACE_MS = 10000;
 
-  /* ---------- helpers ---------- */
+  /* ========== helpers ========== */
 
   function memberName(id) {
     if (id === deviceId) return myName || displayName || 'You';
@@ -304,7 +304,7 @@
     return new Date(ts).toLocaleDateString();
   }
 
-  /* ---------- views ---------- */
+  /* ========== views ========== */
 
   function showJoin() {
     $('join-screen').classList.remove('hidden');
@@ -403,7 +403,7 @@
     $('draft-dismiss').onclick = function () { draft = null; renderDraft(); };
   }
 
-  /* ---------- ledger and balances ---------- */
+  /* ========== ledger and balances ========== */
 
   function renderLedger() {
     var wrap = $('ledger-list');
@@ -500,7 +500,7 @@
     });
   }
 
-  /* ---------- live sync ---------- */
+  /* ========== live sync ========== */
 
   function broadcast(event, payload) {
     if (!channel) return;
@@ -683,7 +683,7 @@
     showJoin();
   }
 
-  /* ---------- chat, drafts, expenses, settle ---------- */
+  /* ========== chat, drafts, expenses, settle ========== */
 
   function sendMessage() {
     var input = $('message-input');
@@ -772,7 +772,7 @@
     toast('Settlement undone.');
   }
 
-  /* ---------- expense form ---------- */
+  /* ========== expense form ========== */
 
   function openExpenseForm(prefill) {
     editingChitId = (prefill && prefill.id) ? prefill.id : null;
@@ -856,7 +856,7 @@
     closeExpenseForm();
   }
 
-  /* ---------- share, join, init ---------- */
+  /* ========== share, join, init ========== */
 
   function shareLink() {
     var url = location.origin + location.pathname + '?room=' + roomCode;
